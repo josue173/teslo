@@ -12,7 +12,7 @@ export class Product {
     unique: true,
   })
   title: string;
-  @Column('numeric', {
+  @Column('float', {
     default: 0,
   })
   price: number;
