@@ -27,7 +27,7 @@ export class Product {
   })
   slug: string; // identificar URLs
   @Column({
-    type: 'numeric',
+    type: 'int',
     default: 0,
   })
   stock: number;
