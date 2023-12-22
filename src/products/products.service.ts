@@ -73,7 +73,6 @@ export class ProductsService {
         // :title y :slug es para indicar que son argumentos, estos a su vez son definidos como segundo parámetro}
         // Tanto title como slug pueden estar en diferentes posiciones en la DB y puede regresar dos resultados, getOne() solo regresa uno
         // las funciones UPPER(), .toUpperCase y .toLowerCase, son para quitar el case sensitive
-        
       }
 
       if (!product) {
@@ -85,8 +84,20 @@ export class ProductsService {
     }
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: string, updateProductDto: UpdateProductDto) {
+    const product = await this._productRepository.preload({
+      id: id,
+      ...updateProductDto,
+    }); // Buscar producto por ID y cargar las propiedades del DTO
+    if (!product)
+      throw new NotFoundException(`Producto with ID: ${id} not found`);
+
+    try {
+      await this._productRepository.save(product);
+      return product;
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
   }
 
   async remove(id: string) {

@@ -2,7 +2,7 @@
   Esto es lo que TypeOrm buscará y tomará com base para crear las entidades
 */
 
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity() // Con esto ya podemos majerar este archivo como entity
 export class Product {
@@ -40,6 +40,13 @@ export class Product {
     type: 'text',
   })
   gender: string;
+  @Column({
+    type: 'text',
+    array: true,
+    default: []
+  })
+  tags: string[];
+
   @BeforeInsert()
   checkSlugInsert() {
     if (!this.slug) {
@@ -50,4 +57,12 @@ export class Product {
       .replaceAll(' ', '_')
       .replaceAll("'", '');
   }
+  @BeforeUpdate()
+  checkSlugUpdate(){
+    this.slug = this.slug
+      .toLowerCase()
+      .replaceAll(' ', '_')
+      .replaceAll("'", '');
+  }
+
 }
