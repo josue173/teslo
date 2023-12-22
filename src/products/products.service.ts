@@ -10,6 +10,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
+import { PaginationDto } from '../common/dtos/pagination.dto';
+import { validate as isUUID } from 'uuid';
 
 @Injectable()
 export class ProductsService {
@@ -17,7 +19,7 @@ export class ProductsService {
 
   constructor(
     @InjectRepository(Product) // El tipo de dato del repositorio
-    private readonly _productRepository: Repository<Product>, // Tipo de dato Product (entidad)
+    private readonly _productRepository: Repository<Product>, // Tipo de dato Product (entidad) // La variable _productRepository proporciona la información necesaria para conectar a la base de datos
   ) {}
 
   async create(createProductDto: CreateProductDto) {
@@ -41,20 +43,41 @@ export class ProductsService {
     }
   }
 
-  findAll() {
+  findAll(paginationDto: PaginationDto) {
     try {
-      const product = this._productRepository.find();
+      const { limit = 10, offset = 0 } = paginationDto;
+      const product = this._productRepository.find({
+        take: limit,
+        skip: offset,
+        // To do: relaciones
+      });
       return product;
     } catch (error) {
       this.handleDBExceptions(error);
     }
   }
 
-  async findOne(id: string) {
+  async findOne(term: string) {
     try {
-      const product = await this._productRepository.findBy({ id });
+      let product: Product;
+      if (isUUID(term)) {
+        product = await this._productRepository.findOneBy({ id: term });
+      } else {
+        const queryBuilder = this._productRepository.createQueryBuilder();
+        product = await queryBuilder
+          .where(`UPPER(title) =: title or slug =:slug`, {
+            title: term.toUpperCase(),
+            slug: term.toLowerCase(),
+          })
+          .getOne();
+        // :title y :slug es para indicar que son argumentos, estos a su vez son definidos como segundo parámetro}
+        // Tanto title como slug pueden estar en diferentes posiciones en la DB y puede regresar dos resultados, getOne() solo regresa uno
+        // las funciones UPPER(), .toUpperCase y .toLowerCase, son para quitar el case sensitive
+        
+      }
+
       if (!product) {
-        throw new NotFoundException(`Product ${id} not founded`);
+        throw new NotFoundException(`Product ${term} not founded`);
       }
       return product;
     } catch (error) {
