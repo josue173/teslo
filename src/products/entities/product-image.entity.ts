@@ -12,6 +12,7 @@ export class productImage {
   @ManyToOne(
     () => Product,
     (product) => product.images, // Así se relaciona con la otra tabla
+    { onDelete: 'CASCADE' },
   )
   product: Product;
 }
