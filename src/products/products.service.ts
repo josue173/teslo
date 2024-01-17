@@ -122,12 +122,32 @@ export class ProductsService {
 
     // Create query runner
     const queryRunner = this._dataSource.createQueryRunner();
-    
+    // Se utiliza queryRunner para realizar transacciones (serie de querys (CRUD) que impactan la DB, hasta que se confirman las acciones)
+    await queryRunner.connect(); // Conexion a la DB
+    await queryRunner.startTransaction(); // Iniciar transaccion
 
     try {
-      await this._productRepository.save(product);
+      if (images) {
+        await queryRunner.manager.delete(productImage, { product: { id } }); // Transacción
+        // Aquí se borraron las imágenes anteriores
+        product.images = images.map((image) =>
+          this._productImageRepository.create({ url: image }),
+        );
+      } else {
+        product.images = await this._productImageRepository.findBy({
+          product: { id },
+        });
+      }
+
+      await queryRunner.manager.save(product); // Transacción
+      // Al usar .manager no se impacta la DB
+      // Ambas transacciones puden fallar, por eso deben revertirse los cambios
+      // await this._productRepository.save(product);
+      await queryRunner.commitTransaction(); // Confirmar las acciones
+      await queryRunner.release(); // Cierra el espacio para transacciones
       return product;
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       this.handleDBExceptions(error);
     }
   }
