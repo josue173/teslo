@@ -2,7 +2,15 @@
   Esto es lo que TypeOrm buscará y tomará com base para crear las entidades
 */
 
-import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { productImage } from './product-image.entity';
 
 @Entity() // Con esto ya podemos majerar este archivo como entity
 export class Product {
@@ -43,9 +51,18 @@ export class Product {
   @Column({
     type: 'text',
     array: true,
-    default: []
+    default: [],
   })
   tags: string[];
+
+  @OneToMany(
+    () => productImage, // Va a regresar un ProductImage
+    (productImage) => productImage.product, // Como se relaciona con la otra entidad
+    { cascade: true, eager: true },
+    // Cascade: sto ayuda con la asociación de este archivo en caso de estar en otra
+    // Eager (para cada método find de productos): esto cargará las imágenes
+  )
+  images?: productImage[];
 
   @BeforeInsert()
   checkSlugInsert() {
@@ -58,11 +75,10 @@ export class Product {
       .replaceAll("'", '');
   }
   @BeforeUpdate()
-  checkSlugUpdate(){
+  checkSlugUpdate() {
     this.slug = this.slug
       .toLowerCase()
       .replaceAll(' ', '_')
       .replaceAll("'", '');
   }
-
 }
