@@ -165,8 +165,9 @@ export class ProductsService {
     throw new InternalServerErrorException('Check server logs');
   }
 
-  async deleteAllProduct() {
+  async deleteAllProducts() {
     const query = this._productRepository.createQueryBuilder('product');
+
     try {
       return await query.delete().where({}).execute();
     } catch (error) {
