@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { productImage } from './product-image.entity';
 
-@Entity() // Con esto ya podemos majerar este archivo como entity
+@Entity({ name: 'products' }) // Con esto ya podemos majerar este archivo como entity
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
