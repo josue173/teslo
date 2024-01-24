@@ -26,6 +26,7 @@ export class User {
   @IsNotEmpty()
   @Column({
     type: 'text',
+    select: false,
   })
   password: string;
 
