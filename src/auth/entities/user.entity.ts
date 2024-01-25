@@ -6,7 +6,14 @@ import {
   IsString,
 } from 'class-validator';
 import { text } from 'stream/consumers';
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
 
 @Entity({ name: 'users' })
 export class User {
@@ -51,4 +58,14 @@ export class User {
     default: ['user'],
   })
   rols: string[];
+
+  @BeforeInsert()
+  checkData() {
+    this.email = this.email.toLowerCase().trim();
+  }
+
+  @BeforeUpdate()
+  checkBeforeUpdate() {
+    this.checkData();
+  }
 }
