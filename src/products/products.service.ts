@@ -13,6 +13,7 @@ import { Product } from './entities/product.entity';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
 import { productImage } from './entities';
+import { User } from 'src/auth/entities/user.entity';
 
 @Injectable()
 export class ProductsService {
@@ -26,7 +27,7 @@ export class ProductsService {
     private readonly _dataSource: DataSource, // Esta inyección sabe cuál es la cadena de conexión
   ) {}
 
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto, user: User) {
     try {
       // if (!createProductDto.slug) {
       //   createProductDto.slug = createProductDto.title
@@ -47,6 +48,7 @@ export class ProductsService {
         images: images.map((image) =>
           this._productImageRepository.create({ url: image }),
         ),
+        user,
       });
       await this._productRepository.save(product); // Aquí se graba la información en la DB
       return { ...product, images: images };
@@ -109,7 +111,7 @@ export class ProductsService {
     // Esta funcion solo hace que el retorno se vea como quiero
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto) {
+  async update(id: string, updateProductDto: UpdateProductDto, user: User) {
     const { images, ...toUpdate } = updateProductDto;
 
     const product = await this._productRepository.preload({
@@ -139,6 +141,7 @@ export class ProductsService {
         });
       }
 
+      product.user = user;
       await queryRunner.manager.save(product); // Transacción
       // Al usar .manager no se impacta la DB
       // Ambas transacciones puden fallar, por eso deben revertirse los cambios
