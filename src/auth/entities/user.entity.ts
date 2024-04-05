@@ -5,12 +5,14 @@ import {
   IsNotEmpty,
   IsString,
 } from 'class-validator';
+import { Product } from 'src/products/entities/product.entity';
 import { text } from 'stream/consumers';
 import {
   BeforeInsert,
   BeforeUpdate,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
@@ -59,6 +61,8 @@ export class User {
   })
   rols: string[];
 
+  @OneToMany(() => Product, (product) => product.user)
+  product: Product;
   @BeforeInsert()
   checkData() {
     this.email = this.email.toLowerCase().trim();

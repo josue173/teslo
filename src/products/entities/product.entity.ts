@@ -7,10 +7,12 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { productImage } from './product-image.entity';
+import { User } from 'src/auth/entities/user.entity';
 
 @Entity({ name: 'products' }) // Con esto ya podemos majerar este archivo como entity
 export class Product {
@@ -63,6 +65,10 @@ export class Product {
     // Eager (para cada método find de productos): esto cargará las imágenes
   )
   images?: productImage[];
+
+  @ManyToOne(() => User, (user) => user.product, { eager: true }) 
+  // Eager carga la relación de usuario y producto (O:M)
+  user: User;
 
   @BeforeInsert()
   checkSlugInsert() {
