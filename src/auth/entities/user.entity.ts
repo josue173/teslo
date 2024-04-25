@@ -57,7 +57,7 @@ export class User {
   @Column({
     type: 'text',
     array: true,
-    default: ['user'],
+    default: ['admin'],
   })
   rols: string[];
 
