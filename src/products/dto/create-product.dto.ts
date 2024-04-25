@@ -1,5 +1,6 @@
 // Este archivo es para ver como se recibirá la información del endpoint
 
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
   IsIn,
@@ -12,35 +13,47 @@ import {
 } from 'class-validator';
 
 export class CreateProductDto {
+  @ApiProperty({
+    description: 'Product title',
+    nullable: false,
+    minLength: 1,
+  })
   @IsString()
   @MinLength(1)
   title: string;
 
+  @ApiProperty()
   @IsNumber()
   @IsPositive()
   @IsOptional()
   price?: number;
 
+  @ApiProperty()
   @IsString()
   @IsOptional()
   description?: string;
 
+  @ApiProperty()
   @IsString()
   @IsOptional()
   slug?: string;
 
+  @ApiProperty()
   @IsInt()
   @IsOptional()
   @IsPositive()
   stock?: number;
 
+  @ApiProperty()
   @IsString({ each: true })
   @IsArray()
   sizes: string[];
 
+  @ApiProperty()
   @IsIn(['men', 'women', 'kid', 'unisex']) // Tipos permitidos
   gender: string;
 
+  @ApiProperty()
   @IsString({
     each: true,
   })
@@ -48,6 +61,7 @@ export class CreateProductDto {
   @IsOptional()
   tags: string[];
 
+  @ApiProperty()
   @IsString({
     each: true,
   })

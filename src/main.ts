@@ -17,7 +17,7 @@ async function bootstrap() {
     .setTitle('teslo api')
     .setDescription('Teslo endpoints')
     .setVersion('1.0')
-    //.addTag('cats')
+    .addBearerAuth() // Hacer que todas las peticiones vayan autenticadas
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
