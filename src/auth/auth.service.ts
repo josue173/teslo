@@ -57,6 +57,13 @@ export class AuthService {
     };
   }
 
+  async chechAuthStatus(user:User) {
+    return {
+      ...user,
+      token: this.getJwtToken({ id: user.id }),
+    };
+  }
+
   private getJwtToken(payload: JwtPayload) {
     const token = this._jwtService.sign(payload); // firmando payload
     return token;
