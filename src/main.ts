@@ -14,6 +14,7 @@ async function bootstrap() {
     }),
   );
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle('teslo api')
     .setDescription('Teslo endpoints')
     .setVersion('1.0')
@@ -21,6 +22,7 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+  
   await app.listen(process.env.PORT);
   logger.log(`App running on port ${process.env.PORT}`);
 }
