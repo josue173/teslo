@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 
 interface ConnectedClients {
-  [id: string]: Socket; //
+  [id: string]: Socket; // id de los sockets
 }
 
 @Injectable()
