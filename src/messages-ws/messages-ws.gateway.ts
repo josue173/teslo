@@ -33,9 +33,23 @@ export class MessagesWsGateway
     );
   }
 
-  @SubscribeMessage('message-from-client') // Reciviendo evento del cliente
+  @SubscribeMessage('message-from-client') // Recibiendo evento del cliente
   handleMessageFromClient(client: Socket, payload: NewMessageDto) {
     console.log(client.id, payload);
-    
+    // Emisión a un solo cliente
+    // client.emit('messsage-from-server', { // Emitiendo al cliente
+    //   fullName: 'Soy yo',
+    //   message: payload.message || 'no-message',
+    // });
+    // Emisión a todos los clientes, menos al inicial
+    // client.broadcast.emit('message-from-server', {
+    //   fullName: 'Soy yo',
+    //   message: payload.message || 'no-message',
+    // });
+    // Emisión a todos los clientes
+    this.wss.emit('message-from-server', {
+      fullName: 'Soy yo',
+      message: payload.message || 'no-message',
+    });
   }
 }
