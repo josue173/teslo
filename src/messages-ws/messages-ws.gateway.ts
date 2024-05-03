@@ -1,11 +1,13 @@
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { MessagesWsService } from './messages-ws.service';
 import { Server, Socket } from 'socket.io';
+import { NewMessageDto } from './dto/new-message.dto';
 
 @WebSocketGateway({ cors: true }) // Interfaces para sabir cuando el usuario se conecta y cuando se desconecta
 export class MessagesWsGateway
@@ -29,5 +31,11 @@ export class MessagesWsGateway
       'clients-updated',
       this.messagesWsService.getConnectendClients(),
     );
+  }
+
+  @SubscribeMessage('message-from-client') // Reciviendo evento del cliente
+  handleMessageFromClient(client: Socket, payload: NewMessageDto) {
+    console.log(client.id, payload);
+    
   }
 }
