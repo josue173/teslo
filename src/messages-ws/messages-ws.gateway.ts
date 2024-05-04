@@ -8,21 +8,50 @@ import {
 import { MessagesWsService } from './messages-ws.service';
 import { Server, Socket } from 'socket.io';
 import { NewMessageDto } from './dto/new-message.dto';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from 'src/auth/interfaces';
 
 @WebSocketGateway({ cors: true }) // Interfaces para sabir cuando el usuario se conecta y cuando se desconecta
 export class MessagesWsGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() wss: Server; // Contiene la información de los clientes conectados
-  constructor(private readonly messagesWsService: MessagesWsService) {}
-  handleConnection(client: Socket) {
-    // console.log('User connected: ', client.id);
+  constructor(
+    private readonly messagesWsService: MessagesWsService,
+    private readonly _jwtService: JwtService,
+  ) {}
+  // handleConnection(client: Socket) {
+  //   // console.log('User connected: ', client.id);
+  //   const token = client.handshake.headers.authentication as string;
+  //   let payload: JwtPayload;
+  //   console.log({ token });
+
+  //   try {
+  //     payload = this._jwtService.verify(token);
+  //   } catch (error) {
+  //     client.disconnect();
+  //     return;
+  //   }
+
+  //   this.messagesWsService.registerCliente(client);
+  //   // console.log({ conectado: this.messagesWsService.getConnectendClients() }); // No de clientes conectados
+  //   this.wss.emit(
+  //     'clients-updated',
+  //     this.messagesWsService.getConnectendClients(),
+  //   );
+  // }
+  async handleConnection(client: Socket) {
     const token = client.handshake.headers.authentication as string;
-    console.log({token});
-    
-    
-    this.messagesWsService.registerCliente(client);
-    // console.log({ conectado: this.messagesWsService.getConnectendClients() }); // No de clientes conectados
+    let payload: JwtPayload;
+    try {
+      payload = this._jwtService.verify(token);
+      //await this.messagesWsService.registerClient(client, payload.id);
+    } catch (error) {
+      client.disconnect();
+      return;
+    }
+    console.log({ payload })
+    // console.log('Cliente conectado:', client.id );
     this.wss.emit(
       'clients-updated',
       this.messagesWsService.getConnectendClients(),
